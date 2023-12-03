@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { useTable, useGroupBy, useExpanded, useSortBy } from 'react-table'
 
@@ -38,7 +38,7 @@ function Table({ columns, data }) {
     () => [
       {
         id: "price",
-        desc: true
+        desc: false
       }
     ],
     []
@@ -172,49 +172,6 @@ function Table({ columns, data }) {
 
 
 function App() {
-
-  const saveSession = ()=>{
-    sessionStorage.setItem('userData', JSON.stringify(data));
-  }
-
-  const resetSession = ()=>{
-    sessionStorage.setItem('userData', JSON.stringify(mockData(9)));
-    setData(getSession());
-
-  }
-
-  const getSession = () => {
-    let kdata = sessionStorage.getItem('userData');
-    if(kdata == null )
-      return null;
-    return JSON.parse(kdata);
-  }
-
-  useEffect(()=>{
-    let kdata = sessionStorage.getItem('userData');
-    if(kdata==null){
-      resetSession();
-    }
-    
-    setData(getSession());
-    
-  },[]);
-
-  const [data,setData] = useState([]);
-
-  // useEffect(()=>{
-  //   console.log(sessionStorage.getItem('userData'));
-
-  // },[]);
-
-  const updatePrice = (row,value) => {
-    
-    setData(prevData => {
-      const tempData = [...prevData];
-      tempData.find(e => e.id === row.id).price = value;
-      return tempData;
-    });
-  }
   
   const columns = React.useMemo(
     () => [
@@ -247,26 +204,9 @@ function App() {
           },
           {
             Header: 'price',
-            accessor: row => <input type={'number'} value={row.price} onChange={(e)=>updatePrice(row,e.target.value)}></input>,
-            // sorted:true,
-            // editable:true,
-            sortType:(rowA,rowB,id,desc)=>{
-              if(rowA.values[id]==null)
-                return 0;
-              if(rowB.values[id]==null)
-                return 0;
-              let a = Number.parseFloat(rowA.values[id].props.value);
-              let b = Number.parseFloat(rowB.values[id].props.value);
-              if (Number.isNaN(a)) {  // Blanks and non-numeric strings to bottom
-                  a = desc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
-              }
-              if (Number.isNaN(b)) {
-                  b = desc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
-              }
-              if (a > b) return 1; 
-              if (a < b) return -1;
-              return 0;
-            }
+            accessor: 'price',
+            sorted:true,
+            editable:true
             // Aggregate the average age of visitors
           },
           {
@@ -284,14 +224,12 @@ function App() {
     []
   )
 
+  const data = React.useMemo(() => mockData(9), [])
 
   return (
-    <>
-    <button onClick={()=>saveSession()}> Save</button>
-    <button onClick={()=>resetSession()} >Reset</button>
-    {data.length>0 && <Styles>
+    <Styles>
       <Table columns={columns} data={data} />
-    </Styles>}</>
+    </Styles>
   )
 }
 
