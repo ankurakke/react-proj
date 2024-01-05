@@ -68,7 +68,6 @@ function Table({ columns, data }) {
   // it at 100 for this use case
   const firstPageRows = rows.slice(0, 100);
   
-
   const getLeafColumns = function (rootColumns) {
     return rootColumns.reduce((leafColumns, column)=>{
         if (column.columns) {
